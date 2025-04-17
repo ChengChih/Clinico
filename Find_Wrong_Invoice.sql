@@ -25,7 +25,17 @@ WITH invoice_numbers_adjust AS (
   FROM numbers
   ORDER BY invoice_numbers
 )
-SELECT a.invoice_number
-FROM invoice_numbers_combine a
-LEFT JOIN invoices b ON a.invoice_number = b.invoice_number
-WHERE b.invoice_number IS NULL;
+, find_missing_invoice AS (
+  SELECT a.invoice_number
+  FROM invoice_numbers_combine a
+  LEFT JOIN invoices b ON a.invoice_number = b.invoice_number
+  WHERE b.invoice_number IS NULL;
+)
+SELECT '' AS id,
+       a.invoice_number,
+       b.track,
+       b.year,
+       b.month,
+       b.begin_number,
+       b.end_number
+FROM find_missing_invoice AS a LEFT JOIN invoice_books AS b ON substring(a.invoice_number, 1 , 2) = b.track
